@@ -21,7 +21,7 @@ pub struct Transactions {
     pub multisig_account: Pubkey,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[account]
 pub struct SignerAccount {
     pub pubkey: Pubkey,
     pub is_signer: bool
@@ -62,5 +62,13 @@ impl Transactions {
                        1024;                       // assume max instruction data size of 1KB
         
         base_size + accounts_size + signers_size + data_size
+    }
+}
+
+impl SignerAccount {
+    pub fn get_max_size() -> usize {
+        // Base size
+        32 +  // pubkey (Pubkey)
+        1     // is_signer (bool)
     }
 }

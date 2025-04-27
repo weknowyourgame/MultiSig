@@ -1,9 +1,9 @@
+use crate::ErrorCode;
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program;
 use anchor_lang::solana_program::instruction::Instruction;
 use crate::state::MultiSigAccount;
 use crate::context::CreateMultisig;
-use crate::ErrorCode;
 
 pub fn create_multisig(
     ctx: Context<CreateMultisig>,

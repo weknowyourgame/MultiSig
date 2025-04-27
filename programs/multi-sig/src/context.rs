@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 use crate::state::{MultiSigAccount, Transactions, SignerAccount};
 
 #[derive(Accounts)]
+#[instruction(owners: Vec<Pubkey>, threshold: u8)]
 pub struct CreateMultisig<'info> {                   // 'info is a lifetime annotation thing meanns this is the context where accounts are active
 
     #[account(mut)]
@@ -60,7 +61,7 @@ pub struct ApproveTransaction<'info> {
     #[account(
         init,
         payer = payer,
-        space = 8 + 32 + 1,
+        space = 8 + SignerAccount::get_max_size(),
         seeds = [b"approve_signer", payer.key().as_ref(), transaction_account.key().as_ref()],
         bump
     )]
@@ -86,7 +87,7 @@ pub struct RejectTransaction<'info> {
     #[account(
         init,
         payer = payer,
-        space = 8 + 32 + 1,
+        space = 8 + SignerAccount::get_max_size(),
         seeds = [b"reject_signer", payer.key().as_ref(), transaction_account.key().as_ref()],
         bump
     )]
