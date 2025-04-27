@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*
-use create::state::{MultiSigAccount, Transactions};
+use create::state::{MultiSigAccount, Transactions, SignerAccount};
 
 #[derive(Accounts)]
 pub struct CreateMultisig<'info> {                   // 'info is a lifetime annotation thing meanns this is the context where accounts are active
@@ -42,3 +42,52 @@ pub struct CreateTransaction<'info> {
     
     pub system_program: Program<'info, System>,
 
+#[derive(Accounts)]
+pub struct ApproveTransaction<'info> {
+
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
+    #[account(
+        init,
+        payer = payer,
+        space = 8 + 32 + 1,                              // for pubkey + bool + 8
+        seeds = [b"approve_signer", payer.key().as_ref()],
+        bump
+    )]
+    pub signer_account: Account<'info, SignerAccount>,
+
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct RejectTransaction<'info> {
+
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
+    #[account(
+        init,
+        payer = payer,
+        space = 8 + 32 + 1,                              // for pubkey + bool + 8
+        seeds = [b"reject_signer", payer.key().as_ref()],
+        bump
+    )]
+    pub signer_account: Account<'info, SignerAccount>,
+
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct ExecuteTransaction<'info> {
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
+    #[account(mut)]
+    pub multisig_account: Account<'info, MultiSigAccount>,
+    
+    #[account(mut)]
+    pub transaction_account: Account<'info, Transactions>,
+
+    pub system_program: Program<'info, System>,
+}
