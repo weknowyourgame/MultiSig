@@ -1,7 +1,5 @@
 # Multi-sig
 
-An example of a multisig to execute arbitrary Solana transactions.
-
 1. Owners - the set of addresses that sign transactions for the multisig.
 2. Threshold - the number of signers required to execute a transaction.
 
