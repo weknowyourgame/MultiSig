@@ -1,10 +1,11 @@
-use anchor_lang::prelude::*
+use anchor_lang::prelude::*;
 
 #[account]
 pub struct MultiSigAccount {
     pub owners: Vec<Pubkey>,
     pub threshold: u8,
-    pub nonce: u8  
+    pub nonce: u8,
+    pub num_transactions_created: u64,
 }
 
 #[account]
@@ -16,9 +17,11 @@ pub struct Transactions {
     pub signers: Vec<bool>,
     pub time: i64,
     pub data: Vec<u8>,
-    pub did_complete: bool
+    pub did_complete: bool,
+    pub multisig_account: Pubkey,
 }
 
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct SignerAccount {
     pub pubkey: Pubkey,
     pub is_signer: bool
@@ -28,7 +31,8 @@ impl MultiSigAccount {
     pub fn get_max_size(num_owners: usize) -> usize {
         // Base size
         let base_size = 1 +  // threshold (u8)
-                        1;   // nonce (u8)
+                        1 +  // nonce (u8)
+                        8;   // num_transactions_created (u64)
         
         // Vector of owners
         let owners_size = 4 +         // vec length prefix
@@ -45,7 +49,8 @@ impl Transactions {
                         32 +  // parent (Pubkey)
                         32 +  // initiator (Pubkey)
                         8 +   // time (i64)
-                        1;    // did_complete (bool)
+                        1 +   // did_complete (bool)
+                        32;   // multisig_account (Pubkey)
         
         let accounts_size = 4 +                              // vec length prefix
                            (num_signers * (32 + 1));         // accounts max * (pubkey + 1 bool)
