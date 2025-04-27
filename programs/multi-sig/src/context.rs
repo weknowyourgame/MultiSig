@@ -19,13 +19,13 @@ pub struct CreateMultisig<'info> {                   // 'info is a lifetime anno
     pub system_program: Program<'info, System>,
 }
 
-#[#[derive(Accounts)]
+#[derive(Accounts)]
 pub struct CreateTransaction<'info> {
 
     pub proposer: Signer<'info>,
  
     #[account(mut)]
-    pub multisig_acnt: Signer<'info, MultiSignAccount>, // Autorizing it to store all signers' data on chain so basically the account that holds all the funds will also contain data of all signer wallets
+    pub multisig_acnt: Signer<'info, MultiSigAccount>, // Autorizing it to store all signers' data on chain so basically the account that holds all the funds will also contain data of all signer wallets
     
     #[account(
         init,
@@ -55,6 +55,8 @@ pub struct ApproveTransaction<'info> {
         seeds = [b"approve_signer", payer.key().as_ref()],
         bump
     )]
+
+    #[account(mut, has_one = multisig_account)]
     pub signer_account: Account<'info, SignerAccount>,
 
     pub system_program: Program<'info, System>,
@@ -73,6 +75,8 @@ pub struct RejectTransaction<'info> {
         seeds = [b"reject_signer", payer.key().as_ref()],
         bump
     )]
+
+    #[account(mut,has_one = multisig_account)]
     pub signer_account: Account<'info, SignerAccount>,
 
     pub system_program: Program<'info, System>,
@@ -86,7 +90,7 @@ pub struct ExecuteTransaction<'info> {
     #[account(mut)]
     pub multisig_account: Account<'info, MultiSigAccount>,
     
-    #[account(mut)]
+    #[account(mut, has_one = multisig_account)]
     pub transaction_account: Account<'info, Transactions>,
 
     pub system_program: Program<'info, System>,
